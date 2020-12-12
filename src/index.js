@@ -1,47 +1,66 @@
 const express = require('express');
+const { uuid } = require('uuidv4')
 
 const app = express();
 
 app.use(express.json());
 
+const projects = [];
+
 app.get('/projects', (req, res) => {
   // Query params
-  const { title, owner } = req.query; // os parâmetros da requisição inseridos no insomnia
+  // const { title, owner } = req.query; // os parâmetros da requisição inseridos no insomnia
 
-  console.log(title);
-  console.log(owner);
+  // console.log(title);
+  // console.log(owner);
 
-  return res.json({ message: 'Essa é a page \'projects\'' });
+  return res.json(projects);
 });
 
 app.post('/projects', (req, res) => {
   const { title, owner } = req.body;
 
-  console.log(title);
-  console.log(owner);
+  const project = {id: uuid(), title, owner }
 
-  return res.json([
-    'Projeto 1',
-    'Projeto 2',
-  ]);
+  projects.push(project);
+
+  return res.json(project);
 });
 
 app.put('/projects/:id', (req, res) => {
   // Routes params
   const { id } = req.params;
+  const { title, owner } = req.body;
 
-  console.log(id);
+  const projectIndex = projects.findIndex(project => project.id === id);
 
-  return res.json([
-    'Projeto 3',
-    'Projeto 2',
-  ]);
+  if (projectIndex < 0) {
+    return res.status(400).json({ error: 'Project not found.' })
+  }
+
+  const project = {
+    id,
+    title,
+    owner,
+  };
+
+  projects[projectIndex] = project;
+
+  return res.json(project);
 });
 
 app.delete('/projects/:id', (req, res) => {
-  return res.json([
-    'Projeto 2',
-  ]);
+  const { id } = req.params;
+
+  const projectIndex = projects.findIndex(project => project.id === id);
+
+  if (projectIndex < 0) {
+    return res.status(400).json({ error: 'Project not found.' })
+  }
+
+  projects.splice(projectIndex, 1);
+
+  return res.status(204).send();
 });
 
 app.listen(3333, () => {
