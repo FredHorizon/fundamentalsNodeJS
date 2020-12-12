@@ -9,12 +9,13 @@ const projects = [];
 
 app.get('/projects', (req, res) => {
   // Query params
-  // const { title, owner } = req.query; // os parâmetros da requisição inseridos no insomnia
+  const { title } = req.query; // os parâmetros da requisição inseridos no insomnia
 
-  // console.log(title);
-  // console.log(owner);
+  const results = title
+    ? projects.filter(project => project.title.includes(title))
+    : projects;
 
-  return res.json(projects);
+  return res.json(results);
 });
 
 app.post('/projects', (req, res) => {
