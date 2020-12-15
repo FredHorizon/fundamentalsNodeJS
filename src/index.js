@@ -7,6 +7,18 @@ app.use(express.json());
 
 const projects = [];
 
+function logRequests(request, response, next) {
+  const { method, url } = request;
+
+  const logLabel = `[${method.toUpperCase()}] ${url}`;
+
+  console.log(logLabel);
+
+  return next();
+}
+
+app.use(logRequests);
+
 app.get('/projects', (req, res) => {
   // Query params
   const { title } = req.query; // os parâmetros da requisição inseridos no insomnia
