@@ -12,14 +12,19 @@ function logRequests(request, response, next) {
 
   const logLabel = `[${method.toUpperCase()}] ${url}`;
 
-  console.log(logLabel);
+  console.log('Passo 1');
+  console.time(logLabel);
 
-  return next();
+  next();
+
+  console.log('Passo 2');
+  console.timeEnd(logLabel);
 }
 
 app.use(logRequests);
 
 app.get('/projects', (req, res) => {
+  console.log('Passo 3');
   // Query params
   const { title } = req.query; // os parâmetros da requisição inseridos no insomnia
 
