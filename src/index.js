@@ -1,5 +1,5 @@
 const express = require('express');
-const { uuid } = require('uuidv4')
+const { uuid, isUuid } = require('uuidv4')
 
 const app = express();
 
@@ -12,19 +12,26 @@ function logRequests(request, response, next) {
 
   const logLabel = `[${method.toUpperCase()}] ${url}`;
 
-  console.log('Passo 1');
   console.time(logLabel);
 
   next();
 
-  console.log('Passo 2');
   console.timeEnd(logLabel);
+}
+
+function validateProjectId(request, response, next) {
+  const { id } = request.params;
+
+  if (!isUuid(id)) {
+    return response.status(400).json({ error: 'Invalid project ID.' });
+  }
+
+  return next();
 }
 
 app.use(logRequests);
 
 app.get('/projects', (req, res) => {
-  console.log('Passo 3');
   // Query params
   const { title } = req.query; // os parâmetros da requisição inseridos no insomnia
 
@@ -45,7 +52,7 @@ app.post('/projects', (req, res) => {
   return res.json(project);
 });
 
-app.put('/projects/:id', (req, res) => {
+app.put('/projects/:id', validateProjectId, (req, res) => {
   // Routes params
   const { id } = req.params;
   const { title, owner } = req.body;
@@ -67,7 +74,7 @@ app.put('/projects/:id', (req, res) => {
   return res.json(project);
 });
 
-app.delete('/projects/:id', (req, res) => {
+app.delete('/projects/:id', validateProjectId, (req, res) => {
   const { id } = req.params;
 
   const projectIndex = projects.findIndex(project => project.id === id);
